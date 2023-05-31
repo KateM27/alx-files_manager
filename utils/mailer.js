@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import fs from 'fs';
 import readline from 'readline';
 import { promisify } from 'util';
@@ -7,19 +6,11 @@ import { gmail_v1 as gmailV1, google } from 'googleapis';
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/gmail.send'];
-// The file token.json stores the user's access and refresh tokens, and is
-// created automatically when the authorization flow completes for the first
-// time.
 const TOKEN_PATH = 'token.json';
 const readFileAsync = promisify(fs.readFile);
 const writeFileAsync = promisify(fs.writeFile);
 
-/**
- * Get and store new token after prompting for user authorization, and then
- * execute the given callback with the authorized OAuth2 client.
- * @param {google.auth.OAuth2} oAuth2Client The OAuth2 client to get token for.
- * @param {getEventsCallback} callback The callback for the authorized client.
- */
+
 async function getNewToken(oAuth2Client, callback) {
   const authUrl = oAuth2Client.generateAuthUrl({
     access_type: 'offline',
@@ -48,12 +39,7 @@ async function getNewToken(oAuth2Client, callback) {
   });
 }
 
-/**
- * Create an OAuth2 client with the given credentials, and then execute the
- * given callback function.
- * @param {Object} credentials The authorization client credentials.
- * @param {function} callback The callback to call with the authorized client.
- */
+
 async function authorize(credentials, callback) {
   const clientSecret = credentials.web.client_secret;
   const clientId = credentials.web.client_id;
@@ -64,7 +50,6 @@ async function authorize(credentials, callback) {
     redirectURIs[0],
   );
   console.log('Client authorization beginning');
-  // Check if we have previously stored a token.
   await readFileAsync(TOKEN_PATH)
     .then((token) => {
       oAuth2Client.setCredentials(JSON.parse(token));
@@ -73,11 +58,7 @@ async function authorize(credentials, callback) {
   console.log('Client authorization done');
 }
 
-/**
- * Delivers a mail through the user's account.
- * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
- * @param {gmailV1.Schema$Message} mail The message to send.
- */
+
 function sendMailService(auth, mail) {
   const gmail = google.gmail({ version: 'v1', auth });
 
@@ -93,9 +74,7 @@ function sendMailService(auth, mail) {
   });
 }
 
-/**
- * Contains routines for mail delivery with GMail.
- */
+
 export default class Mailer {
   static checkAuth() {
     readFileAsync('credentials.json')
